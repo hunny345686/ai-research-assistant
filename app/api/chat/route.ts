@@ -1,4 +1,5 @@
-import { genrateResponce } from "@/app/ai/llm/generate";
+// import { genrateResponce } from "@/app/ai/llm/generate";
+import { genrateStream } from "@/app/ai/llm/generateStream";
 import { ChatMemory } from "@/app/ai/memory/chatMemory";
 import { SYSTEM_PROMPT } from "@/app/ai/prompt/systemPrompt";
 import { NextRequest } from "next/server";
@@ -15,13 +16,27 @@ export async function POST(req: NextRequest) {
     role: "user",
     content: message,
   });
-  const responce = await genrateResponce(message);
+  // const responce = await genrateResponce(memory.getMessage());
+  const stream = await genrateStream(memory.getMessage());
 
-  memory.addMessage({
-    role: "assistant",
-    content: responce || "",
+  const encoder = new TextEncoder();
+
+  const readableStream = new ReadableStream({
+    async start(controller) {
+      let fullResponce: string = "";
+
+      for await (const chunk of stream) {
+        const token = chunk.choices[0]?.delta.content || "";
+        fullResponce += token;
+        controller.enqueue(encoder.encode(token));
+      }
+      memory.addMessage({
+        role: "assistant",
+        content: fullResponce || "",
+      });
+      controller.close();
+    },
   });
-  return Response.json({
-    answer: responce,
-  });
+
+  return new Response(readableStream);
 }
