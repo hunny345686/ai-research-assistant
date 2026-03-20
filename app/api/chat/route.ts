@@ -1,5 +1,6 @@
 // import { genrateResponce } from "@/app/ai/llm/generate";
-import { genrateStream } from "@/app/ai/llm/generateStream";
+// import { genrateStream } from "@/app/ai/llm/generateStream";
+import { generateWithTools } from "@/app/ai/llm/generateWithTools";
 import { ChatMemory } from "@/app/ai/memory/chatMemory";
 import { SYSTEM_PROMPT } from "@/app/ai/prompt/systemPrompt";
 import { NextRequest } from "next/server";
@@ -17,26 +18,28 @@ export async function POST(req: NextRequest) {
     content: message,
   });
   // const responce = await genrateResponce(memory.getMessage());
-  const stream = await genrateStream(memory.getMessage());
+  // const stream = await genrateStream(memory.getMessage());
+  // const stream = await genrateStream(memory.getMessage());
+  const response = await generateWithTools(memory.getMessage());
 
-  const encoder = new TextEncoder();
+  // const encoder = new TextEncoder();
 
-  const readableStream = new ReadableStream({
-    async start(controller) {
-      let fullResponce: string = "";
+  // const readableStream = new ReadableStream({
+  //   async start(controller) {
+  //     let fullResponce: string = "";
 
-      for await (const chunk of stream) {
-        const token = chunk.choices[0]?.delta.content || "";
-        fullResponce += token;
-        controller.enqueue(encoder.encode(token));
-      }
-      memory.addMessage({
-        role: "assistant",
-        content: fullResponce || "",
-      });
-      controller.close();
-    },
-  });
+  //     for await (const chunk of stream) {
+  //       const token = chunk.choices[0]?.delta.content || "";
+  //       fullResponce += token;
+  //       controller.enqueue(encoder.encode(token));
+  //     }
+  //     memory.addMessage({
+  //       role: "assistant",
+  //       content: fullResponce || "",
+  //     });
+  //     controller.close();
+  //   },
+  // });
 
-  return new Response(readableStream);
+  return new Response(response);
 }
