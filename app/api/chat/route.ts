@@ -1,5 +1,6 @@
 // import { genrateResponce } from "@/app/ai/llm/generate";
 // import { genrateStream } from "@/app/ai/llm/generateStream";
+import { runAgents } from "@/app/ai/agents/orchestrator";
 import { generateWithTools } from "@/app/ai/llm/generateWithTools";
 import { ChatMemory } from "@/app/ai/memory/chatMemory";
 import { SYSTEM_PROMPT } from "@/app/ai/prompt/systemPrompt";
@@ -20,7 +21,9 @@ export async function POST(req: NextRequest) {
   // const responce = await genrateResponce(memory.getMessage());
   // const stream = await genrateStream(memory.getMessage());
   // const stream = await genrateStream(memory.getMessage());
-  const response = await generateWithTools(memory.getMessage());
+
+  // const response = await generateWithTools(memory.getMessage());
+  const response = await runAgents(message);
 
   // const encoder = new TextEncoder();
 
