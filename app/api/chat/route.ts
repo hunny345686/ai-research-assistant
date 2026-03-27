@@ -4,6 +4,7 @@ import { runAgents } from "@/app/ai/agents/orchestrator";
 import { generateWithTools } from "@/app/ai/llm/generateWithTools";
 import { ChatMemory } from "@/app/ai/memory/chatMemory";
 import { SYSTEM_PROMPT } from "@/app/ai/prompt/systemPrompt";
+import { generateRAG } from "@/app/ai/rag/generateRAG";
 import { NextRequest } from "next/server";
 
 const memory = new ChatMemory();
@@ -23,7 +24,8 @@ export async function POST(req: NextRequest) {
   // const stream = await genrateStream(memory.getMessage());
 
   // const response = await generateWithTools(memory.getMessage());
-  const response = await runAgents(message);
+  // const response = await runAgents(message);
+  const response = await generateRAG(message);
 
   // const encoder = new TextEncoder();
 
