@@ -1,3 +1,4 @@
+import { logger } from "@/app/lib/logger";
 import { Messages } from "../memory/chatMemory";
 import { tools } from "../tools/definitions";
 import { runTool } from "../tools/router";
@@ -10,6 +11,17 @@ export async function generateWithTools(message: Messages[]) {
     tools,
     tool_choice: "auto",
   });
+
+  const usage = responce.usage;
+
+  logger.info(
+    {
+      promptTokens: usage?.prompt_tokens,
+      completionTokens: usage?.completion_tokens,
+      totalTokens: usage?.total_tokens,
+    },
+    "Token usage"
+  );
 
   const msg = responce.choices[0].message;
   if (msg.tool_calls?.length) {
